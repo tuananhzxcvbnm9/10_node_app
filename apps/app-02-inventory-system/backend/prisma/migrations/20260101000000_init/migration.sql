@@ -1,0 +1,3 @@
+CREATE TABLE "User" ("id" TEXT PRIMARY KEY, "email" TEXT UNIQUE NOT NULL, "password" TEXT NOT NULL, "role" TEXT NOT NULL DEFAULT 'member', "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE "InventoryItem" ("id" TEXT PRIMARY KEY, "name" TEXT NOT NULL, "status" TEXT NOT NULL DEFAULT 'active', "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE INDEX "InventoryItem_name_idx" ON "InventoryItem"("name");

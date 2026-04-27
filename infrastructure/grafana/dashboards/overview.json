@@ -1,0 +1,35 @@
+{
+  "title": "Monorepo Production Overview",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 2,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "App Up",
+      "targets": [
+        {
+          "expr": "app_up"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Memory RSS",
+      "targets": [
+        {
+          "expr": "app_memory_rss_bytes"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Uptime Seconds",
+      "targets": [
+        {
+          "expr": "app_uptime_seconds"
+        }
+      ]
+    }
+  ]
+}

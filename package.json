@@ -1,0 +1,15 @@
+{
+  "name": "nodejs-10-apps-monorepo",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "install:all": "pnpm install",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "format": "pnpm -r format",
+    "up": "docker compose up --build",
+    "down": "docker compose down"
+  }
+}

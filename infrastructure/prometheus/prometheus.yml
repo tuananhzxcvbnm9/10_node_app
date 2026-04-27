@@ -1,0 +1,35 @@
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: prometheus
+    static_configs: [{ targets: ['prometheus:9090'] }]
+  - job_name: app-01-backend
+    static_configs: [{ targets: ['app-01-backend:3000'] }]
+    metrics_path: /metrics
+  - job_name: app-02-backend
+    static_configs: [{ targets: ['app-02-backend:3000'] }]
+    metrics_path: /metrics
+  - job_name: app-03-backend
+    static_configs: [{ targets: ['app-03-backend:3000'] }]
+    metrics_path: /metrics
+  - job_name: app-04-backend
+    static_configs: [{ targets: ['app-04-backend:3000'] }]
+    metrics_path: /metrics
+  - job_name: app-05-backend
+    static_configs: [{ targets: ['app-05-backend:3000'] }]
+    metrics_path: /metrics
+  - job_name: app-06-backend
+    static_configs: [{ targets: ['app-06-backend:3000'] }]
+    metrics_path: /metrics
+  - job_name: app-07-backend
+    static_configs: [{ targets: ['app-07-backend:3000'] }]
+    metrics_path: /metrics
+  - job_name: app-08-backend
+    static_configs: [{ targets: ['app-08-backend:3000'] }]
+    metrics_path: /metrics
+  - job_name: app-09-backend
+    static_configs: [{ targets: ['app-09-backend:3000'] }]
+    metrics_path: /metrics
+  - job_name: app-10-backend
+    static_configs: [{ targets: ['app-10-backend:3000'] }]
+    metrics_path: /metrics

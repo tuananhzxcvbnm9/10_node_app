@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-09-frontend
+spec:
+  selector:
+    app: app-09-frontend
+  ports:
+    - port: 80
+      targetPort: 4173

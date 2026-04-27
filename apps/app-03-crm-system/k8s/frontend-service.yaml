@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-03-frontend
+spec:
+  selector:
+    app: app-03-frontend
+  ports:
+    - port: 80
+      targetPort: 4173
