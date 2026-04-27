@@ -1,0 +1,414 @@
+services:
+  reverse-proxy:
+    image: nginx:1.27-alpine
+    ports: ["80:80"]
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app-01-frontend
+      - app-02-frontend
+      - app-03-frontend
+      - app-04-frontend
+      - app-05-frontend
+      - app-06-frontend
+      - app-07-frontend
+      - app-08-frontend
+      - app-09-frontend
+      - app-10-frontend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    volumes:
+      - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports: ["9090:9090"]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/healthy"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+    ports: ["3000:3000"]
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./infrastructure/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./infrastructure/grafana/provisioning:/etc/grafana/provisioning
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 6
+    networks: [app-network]
+
+
+  app-01-backend:
+    build: ./apps/app-01-task-manager/backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/app01_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      LOG_LEVEL: ${LOG_LEVEL}
+      PORT: 3000
+      APP_NAME: app-01
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+  app-01-frontend:
+    build: ./apps/app-01-task-manager/frontend
+    depends_on:
+      - app-01-backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4173"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+
+  app-02-backend:
+    build: ./apps/app-02-inventory-system/backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/app02_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      LOG_LEVEL: ${LOG_LEVEL}
+      PORT: 3000
+      APP_NAME: app-02
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+  app-02-frontend:
+    build: ./apps/app-02-inventory-system/frontend
+    depends_on:
+      - app-02-backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4173"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+
+  app-03-backend:
+    build: ./apps/app-03-crm-system/backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/app03_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      LOG_LEVEL: ${LOG_LEVEL}
+      PORT: 3000
+      APP_NAME: app-03
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+  app-03-frontend:
+    build: ./apps/app-03-crm-system/frontend
+    depends_on:
+      - app-03-backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4173"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+
+  app-04-backend:
+    build: ./apps/app-04-booking-system/backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/app04_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      LOG_LEVEL: ${LOG_LEVEL}
+      PORT: 3000
+      APP_NAME: app-04
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+  app-04-frontend:
+    build: ./apps/app-04-booking-system/frontend
+    depends_on:
+      - app-04-backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4173"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+
+  app-05-backend:
+    build: ./apps/app-05-ecommerce-admin/backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/app05_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      LOG_LEVEL: ${LOG_LEVEL}
+      PORT: 3000
+      APP_NAME: app-05
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+  app-05-frontend:
+    build: ./apps/app-05-ecommerce-admin/frontend
+    depends_on:
+      - app-05-backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4173"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+
+  app-06-backend:
+    build: ./apps/app-06-learning-management/backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/app06_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      LOG_LEVEL: ${LOG_LEVEL}
+      PORT: 3000
+      APP_NAME: app-06
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+  app-06-frontend:
+    build: ./apps/app-06-learning-management/frontend
+    depends_on:
+      - app-06-backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4173"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+
+  app-07-backend:
+    build: ./apps/app-07-expense-tracker/backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/app07_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      LOG_LEVEL: ${LOG_LEVEL}
+      PORT: 3000
+      APP_NAME: app-07
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+  app-07-frontend:
+    build: ./apps/app-07-expense-tracker/frontend
+    depends_on:
+      - app-07-backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4173"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+
+  app-08-backend:
+    build: ./apps/app-08-helpdesk-ticketing/backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/app08_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      LOG_LEVEL: ${LOG_LEVEL}
+      PORT: 3000
+      APP_NAME: app-08
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+  app-08-frontend:
+    build: ./apps/app-08-helpdesk-ticketing/frontend
+    depends_on:
+      - app-08-backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4173"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+
+  app-09-backend:
+    build: ./apps/app-09-blog-cms/backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/app09_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      LOG_LEVEL: ${LOG_LEVEL}
+      PORT: 3000
+      APP_NAME: app-09
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+  app-09-frontend:
+    build: ./apps/app-09-blog-cms/frontend
+    depends_on:
+      - app-09-backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4173"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+
+  app-10-backend:
+    build: ./apps/app-10-analytics-dashboard/backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/app10_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      LOG_LEVEL: ${LOG_LEVEL}
+      PORT: 3000
+      APP_NAME: app-10
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+  app-10-frontend:
+    build: ./apps/app-10-analytics-dashboard/frontend
+    depends_on:
+      - app-10-backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4173"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [app-network]
+
+
+networks:
+  app-network:
+    driver: bridge
+volumes:
+  postgres-data:
+  grafana-data:

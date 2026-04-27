@@ -1,0 +1,1 @@
+export const authCommon = 'auth';

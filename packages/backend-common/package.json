@@ -1,0 +1,13 @@
+{
+  "name": "@repo/backend-common",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "type": "commonjs",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "class-validator": "^0.14.1",
+    "class-transformer": "^0.5.1",
+    "jsonwebtoken": "^9.0.2",
+    "pino": "^9.5.0"
+  }
+}

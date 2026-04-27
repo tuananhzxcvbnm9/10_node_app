@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-05-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-05-frontend
+  template:
+    metadata:
+      labels:
+        app: app-05-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: app-05-frontend:latest
+          ports:
+            - containerPort: 4173
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 4173
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 4173
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
